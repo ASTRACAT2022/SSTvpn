@@ -53,14 +53,14 @@ CORS(app, resources={r"/api/.*": {
         "http://localhost:5001",
         "http://127.0.0.1:5001",
         YOUR_SERVER_IP_OR_DOMAIN,
-        "https://stealthnet.app",
-        "http://stealthnet.app"
+        "https://astracat-cloud.app",
+        "http://astracat-cloud.app"
     ]
 }})
 
 # База данных и Секреты
 app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///stealthnet.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///astracat-cloud.db'
 app.config['FERNET_KEY'] = FERNET_KEY_STR.encode() if FERNET_KEY_STR else None
 
 # Кэширование
@@ -77,9 +77,9 @@ app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
 app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
 # Устанавливаем отправителя только если MAIL_USERNAME настроен
 if app.config['MAIL_USERNAME']:
-    app.config['MAIL_DEFAULT_SENDER'] = ('StealthNET', app.config['MAIL_USERNAME'])
+    app.config['MAIL_DEFAULT_SENDER'] = ('ASTRACAT Cloud', app.config['MAIL_USERNAME'])
 else:
-    app.config['MAIL_DEFAULT_SENDER'] = ('StealthNET', 'noreply@stealthnet.app')
+    app.config['MAIL_DEFAULT_SENDER'] = ('ASTRACAT Cloud', 'noreply@astracat-cloud.app')
 
 # Лимитер (Защита от спама запросами)
 limiter = Limiter(
@@ -195,7 +195,7 @@ class SystemSetting(db.Model):
 class BrandingSetting(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     logo_url = db.Column(db.String(500), nullable=True)  # URL логотипа
-    site_name = db.Column(db.String(100), default='StealthNET', nullable=False)  # Название сайта
+    site_name = db.Column(db.String(100), default='ASTRACAT Cloud', nullable=False)  # Название сайта
     site_subtitle = db.Column(db.String(200), nullable=True)  # Подзаголовок
     login_welcome_text = db.Column(db.String(200), nullable=True)  # Текст приветствия на странице входа
     register_welcome_text = db.Column(db.String(200), nullable=True)  # Текст приветствия на странице регистрации
@@ -578,14 +578,14 @@ def forgot_password():
         user_email = user.email  # Сохраняем email пользователя в отдельную переменную
         print(f"[FORGOT PASSWORD] Email пользователя для отправки: {user_email}")
         password_label = "Ваш пароль" if password_source == "existing" else "Ваш новый пароль"
-        subject = "Восстановление пароля StealthNET"
+        subject = "Восстановление пароля ASTRACAT Cloud"
         html_body = f"""
         <html>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
             <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
                 <h2 style="color: #4a90e2;">Восстановление пароля</h2>
                 <p>Здравствуйте!</p>
-                <p>Вы запросили восстановление пароля для вашего аккаунта StealthNET.</p>
+                <p>Вы запросили восстановление пароля для вашего аккаунта ASTRACAT Cloud.</p>
                 <p><strong>{password_label}:</strong></p>
                 <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0; font-family: monospace; font-size: 18px; text-align: center; letter-spacing: 2px;">
                     {password_to_send}
@@ -593,7 +593,7 @@ def forgot_password():
                 <p style="color: #666; font-size: 14px;">{"Используйте этот пароль для входа в систему." if password_source == "existing" else "Рекомендуем изменить этот пароль после входа в систему."}</p>
                 <p style="color: #666; font-size: 14px;">Если вы не запрашивали восстановление пароля, проигнорируйте это письмо.</p>
                 <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-                <p style="color: #999; font-size: 12px;">© 2025 StealthNET. Privacy First.</p>
+                <p style="color: #999; font-size: 12px;">© 2025 ASTRACAT Cloud. Privacy First.</p>
             </div>
         </body>
         </html>
@@ -840,7 +840,7 @@ def telegram_login():
                                         # Попытка 2.1: Извлечь UUID из subscription_url (если там он есть)
                                         subscription_url = subscription.get('subscription_url', '')
                                         if subscription_url:
-                                            # subscription_url имеет формат: https://admin.stealthnet.app/{UUID}
+                                            # subscription_url имеет формат: https://admin.astracat-cloud.app/{UUID}
                                             # Пробуем извлечь UUID из URL
                                             import re
                                             url_parts = subscription_url.split('/')
@@ -1831,7 +1831,7 @@ def get_miniapp_path():
     # 3. Стандартные пути (в порядке приоритета)
     possible_paths = [
         # Пользовательские пути (из сообщений)
-        os.path.join('/var/www', 'stealthnet-client', 'build', 'miniapp'),
+        os.path.join('/var/www', 'astracat-cloud-client', 'build', 'miniapp'),
         os.path.join('/opt', 'admin-panel', 'build', 'miniapp'),
         
         # Относительно текущего файла
@@ -1844,8 +1844,8 @@ def get_miniapp_path():
         os.path.join('/srv', 'admin-panel', 'build', 'miniapp'),
         os.path.join('/srv', 'miniapp'),
         os.path.join('/opt', 'miniapp'),
-        os.path.join('/opt', 'stealthnet', 'admin-panel', 'build', 'miniapp'),
-        os.path.join('/opt', 'stealthnet-client', 'build', 'miniapp'),
+        os.path.join('/opt', 'astracat-cloud', 'admin-panel', 'build', 'miniapp'),
+        os.path.join('/opt', 'astracat-cloud-client', 'build', 'miniapp'),
         os.path.join(os.path.expanduser('~'), 'admin-panel', 'build', 'miniapp'),
         os.path.join(os.path.expanduser('~'), 'miniapp'),
     ]
@@ -1906,7 +1906,7 @@ def miniapp_app_config():
     # Стандартные пути относительно текущего файла
     possible_paths.extend([
         # Пользовательские пути (из сообщений)
-        os.path.join('/var/www', 'stealthnet-client', 'build', 'miniapp', 'app-config.json'),
+        os.path.join('/var/www', 'astracat-cloud-client', 'build', 'miniapp', 'app-config.json'),
         os.path.join('/opt', 'admin-panel', 'build', 'miniapp', 'app-config.json'),
         
         # Относительно текущего файла
@@ -1920,8 +1920,8 @@ def miniapp_app_config():
         os.path.join('/srv', 'admin-panel', 'build', 'miniapp', 'app-config.json'),
         os.path.join('/srv', 'miniapp', 'app-config.json'),
         os.path.join('/opt', 'miniapp', 'app-config.json'),
-        os.path.join('/opt', 'stealthnet', 'admin-panel', 'build', 'miniapp', 'app-config.json'),
-        os.path.join('/opt', 'stealthnet-client', 'build', 'miniapp', 'app-config.json'),
+        os.path.join('/opt', 'astracat-cloud', 'admin-panel', 'build', 'miniapp', 'app-config.json'),
+        os.path.join('/opt', 'astracat-cloud-client', 'build', 'miniapp', 'app-config.json'),
         os.path.join(os.path.expanduser('~'), 'admin-panel', 'build', 'miniapp', 'app-config.json'),
         os.path.join(os.path.expanduser('~'), 'miniapp', 'app-config.json'),
     ])
@@ -1967,7 +1967,7 @@ def miniapp_app_config():
             "config": {
                 "additionalLocales": ["ru", "zh", "fa"],
                 "branding": {
-                    "name": "StealthNET",
+                    "name": "ASTRACAT Cloud",
                     "logoUrl": "",
                     "supportUrl": "https://t.me"
                 }
@@ -1992,7 +1992,7 @@ def miniapp_app_config():
             if 'branding' not in config_data['config']:
                 config_data['config']['branding'] = {}
             
-            config_data['config']['branding']['name'] = branding.site_name or "StealthNET"
+            config_data['config']['branding']['name'] = branding.site_name or "ASTRACAT Cloud"
             if branding.logo_url:
                 config_data['config']['branding']['logoUrl'] = branding.logo_url
             # supportUrl можно оставить как есть или добавить в BrandingSetting
@@ -2462,7 +2462,7 @@ def miniapp_create_payment():
                 stars_amount = 1
             
             invoice_payload = {
-                "title": f"Подписка StealthNET - {t.name}",
+                "title": f"Подписка ASTRACAT Cloud - {t.name}",
                 "description": f"Подписка на {t.duration_days} дней",
                 "payload": order_id,
                 "provider_token": "",
@@ -2528,7 +2528,7 @@ def miniapp_create_payment():
                     "type": "redirect",
                     "return_url": f"{YOUR_SERVER_IP_OR_DOMAIN}/miniapp/"
                 },
-                "description": f"Подписка StealthNET - {t.name} ({t.duration_days} дней)",
+                "description": f"Подписка ASTRACAT Cloud - {t.name} ({t.duration_days} дней)",
                 "metadata": {
                     "order_id": order_id,
                     "user_id": str(user.id),
@@ -2615,8 +2615,8 @@ def miniapp_create_payment():
                     "currency": info['c']
                 },
                 "description": f"Payment for order {transaction_uuid}",
-                "return": f"{YOUR_SERVER_IP_OR_DOMAIN}/dashboard/subscription" if YOUR_SERVER_IP_OR_DOMAIN else "https://panel.stealthnet.app/dashboard/subscription",
-                "failedUrl": f"{YOUR_SERVER_IP_OR_DOMAIN}/dashboard/subscription" if YOUR_SERVER_IP_OR_DOMAIN else "https://panel.stealthnet.app/dashboard/subscription"
+                "return": f"{YOUR_SERVER_IP_OR_DOMAIN}/dashboard/subscription" if YOUR_SERVER_IP_OR_DOMAIN else "https://panel.astracat-cloud.app/dashboard/subscription",
+                "failedUrl": f"{YOUR_SERVER_IP_OR_DOMAIN}/dashboard/subscription" if YOUR_SERVER_IP_OR_DOMAIN else "https://panel.astracat-cloud.app/dashboard/subscription"
             }
             
             # Заголовки согласно документации Platega API
@@ -2708,7 +2708,7 @@ def miniapp_create_payment():
                 "amount": str(final_amount),
                 "uuid": order_id,
                 "shopId": shop_id_int,
-                "description": f"Подписка StealthNET - {t.name} ({t.duration_days} дней)",
+                "description": f"Подписка ASTRACAT Cloud - {t.name} ({t.duration_days} дней)",
                 "subscribe": None,
                 "holdTime": None
             }
@@ -2785,7 +2785,7 @@ def miniapp_create_payment():
                 "amount": str(final_amount),
                 "uuid": order_id,
                 "shopId": shop_id_int,
-                "description": f"Подписка StealthNET - {t.name} ({t.duration_days} дней)",
+                "description": f"Подписка ASTRACAT Cloud - {t.name} ({t.duration_days} дней)",
                 "subscribe": None,
                 "holdTime": None
             }
@@ -2869,7 +2869,7 @@ def miniapp_create_payment():
                 "ccy": currency_code,
                 "merchantPaymInfo": {
                     "reference": order_id,
-                    "destination": f"Подписка StealthNET - {t.name} ({t.duration_days} дней)",
+                    "destination": f"Подписка ASTRACAT Cloud - {t.name} ({t.duration_days} дней)",
                     "basketOrder": [
                         {
                             "name": f"Подписка {t.name}",
@@ -4710,7 +4710,7 @@ def branding_settings(current_admin):
     if request.method == 'GET':
         return jsonify({
             "logo_url": b.logo_url or "",
-            "site_name": b.site_name or "StealthNET",
+            "site_name": b.site_name or "ASTRACAT Cloud",
             "site_subtitle": b.site_subtitle or "",
             "login_welcome_text": b.login_welcome_text or "",
             "register_welcome_text": b.register_welcome_text or "",
@@ -4728,7 +4728,7 @@ def branding_settings(current_admin):
         if 'logo_url' in data:
             b.logo_url = data['logo_url'] or None
         if 'site_name' in data:
-            b.site_name = data['site_name'] or "StealthNET"
+            b.site_name = data['site_name'] or "ASTRACAT Cloud"
         if 'site_subtitle' in data:
             b.site_subtitle = data['site_subtitle'] or None
         if 'login_welcome_text' in data:
@@ -4762,7 +4762,7 @@ def public_branding():
     
     return jsonify({
         "logo_url": b.logo_url or "",
-        "site_name": b.site_name or "StealthNET",
+        "site_name": b.site_name or "ASTRACAT Cloud",
         "site_subtitle": b.site_subtitle or "",
         "login_welcome_text": b.login_welcome_text or "",
         "register_welcome_text": b.register_welcome_text or "",
@@ -4874,7 +4874,7 @@ def pay_settings(current_admin):
                 import sqlite3
                 db_path = app.config.get('SQLALCHEMY_DATABASE_URI', '').replace('sqlite:///', '')
                 if not db_path:
-                    db_path = 'stealthnet.db'
+                    db_path = 'astracat-cloud.db'
                 
                 conn = sqlite3.connect(db_path)
                 cursor = conn.cursor()
@@ -5079,7 +5079,7 @@ def create_payment():
             
             # Создаем инвойс через Telegram Bot API
             invoice_payload = {
-                "title": f"Подписка StealthNET - {t.name}",
+                "title": f"Подписка ASTRACAT Cloud - {t.name}",
                 "description": f"Подписка на {t.duration_days} дней",
                 "payload": order_id,
                 "provider_token": "",  # Пустой для Stars
@@ -5138,7 +5138,7 @@ def create_payment():
                     "type": "redirect",
                     "return_url": f"{YOUR_SERVER_IP_OR_DOMAIN}/dashboard/subscription"
                 },
-                "description": f"Подписка StealthNET - {t.name} ({t.duration_days} дней)",
+                "description": f"Подписка ASTRACAT Cloud - {t.name} ({t.duration_days} дней)",
                 "metadata": {
                     "order_id": order_id,
                     "user_id": str(user.id),
@@ -5296,7 +5296,7 @@ def create_payment():
                 "amount": str(final_amount),
                 "uuid": order_id,
                 "shopId": shop_id_int,
-                "description": f"Подписка StealthNET - {t.name} ({t.duration_days} дней)",
+                "description": f"Подписка ASTRACAT Cloud - {t.name} ({t.duration_days} дней)",
                 "subscribe": None,
                 "holdTime": None
             }
@@ -5371,7 +5371,7 @@ def create_payment():
                 "ccy": currency_code,
                 "merchantPaymInfo": {
                     "reference": order_id,
-                    "destination": f"Подписка StealthNET - {t.name} ({t.duration_days} дней)",
+                    "destination": f"Подписка ASTRACAT Cloud - {t.name} ({t.duration_days} дней)",
                     "basketOrder": [
                         {
                             "name": f"Подписка {t.name}",
@@ -5516,7 +5516,7 @@ def create_payment():
                 "amount": str(final_amount),
                 "uuid": order_id,
                 "shopId": shop_id_int,
-                "description": f"Подписка StealthNET - {t.name} ({t.duration_days} дней)",
+                "description": f"Подписка ASTRACAT Cloud - {t.name} ({t.duration_days} дней)",
                 "subscribe": None,
                 "holdTime": None
             }
@@ -6960,14 +6960,14 @@ def bot_register():
             }), 400
         
         # Генерируем логин (email) и пароль
-        # Логин: tg_{telegram_id}@stealthnet.local
-        email = f"tg_{telegram_id}@stealthnet.local"
+        # Логин: tg_{telegram_id}@astracat-cloud.local
+        email = f"tg_{telegram_id}@astracat-cloud.local"
         
         # Проверяем, не занят ли email (маловероятно, но на всякий случай)
         if User.query.filter_by(email=email).first():
             # Если занят, добавляем случайную часть
             random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=4))
-            email = f"tg_{telegram_id}_{random_suffix}@stealthnet.local"
+            email = f"tg_{telegram_id}_{random_suffix}@astracat-cloud.local"
         
         # Генерируем пароль: 12 символов (буквы + цифры)
         password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
@@ -7512,7 +7512,7 @@ def init_database():
             branding_setting = BrandingSetting(
                 id=1,
                 logo_url=None,
-                site_name='StealthNET',
+                site_name='ASTRACAT Cloud',
                 site_subtitle=None,
                 login_welcome_text=None,
                 register_welcome_text=None,
